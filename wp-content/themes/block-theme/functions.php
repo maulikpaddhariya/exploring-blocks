@@ -40,6 +40,13 @@ function block_theme_setup() {
 			'color' => '#145433', 
 		),
 	) );
+	add_theme_support( 'editor-font-sizes', array(
+		array(
+			'name' => esc_attr__('small', 'boilerplate'),
+			'slug' => 'small',
+			'size' => '12', 
+		),
+	) );
 
 	/*
 		* Let WordPress manage the document title.
