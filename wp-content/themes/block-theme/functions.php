@@ -30,6 +30,23 @@ function block_theme_setup() {
 
 	// Add default posts and comments RSS feed links to head.
 	add_theme_support( 'automatic-feed-links' );
+	add_theme_support( 'editor-styles' );
+	add_theme_support( 'responsive-embeds' );
+	add_theme_support( 'align-wide' );
+	add_theme_support( 'editor-color-palette', array(
+		array(
+			'name' => esc_attr__('strong magenta', 'boilerplate'),
+			'slug' => 'strong-magenta',
+			'color' => '#145433', 
+		),
+	) );
+	add_theme_support( 'editor-font-sizes', array(
+		array(
+			'name' => esc_attr__('small', 'boilerplate'),
+			'slug' => 'small',
+			'size' => '12', 
+		),
+	) );
 
 	/*
 		* Let WordPress manage the document title.
