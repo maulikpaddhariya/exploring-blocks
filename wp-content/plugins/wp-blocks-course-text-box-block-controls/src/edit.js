@@ -3,85 +3,93 @@ import {
 	useBlockProps,
 	RichText,
 	BlockControls,
+	AlignmentToolbar,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import {
-	ToolbarGroup,
-	ToolbarButton,
-	ToolbarDropdownMenu,
+	// eslint-disable-next-line
+	__experimentalBoxControl as BoxControl,
+	PanelBody,
+	RangeControl,
 } from '@wordpress/components';
+import classnames from 'classnames';
 import './editor.scss';
 
-export default function Edit( { attributes, setAttributes } ) {
-	const { text } = attributes;
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
+export default function Edit( props ) {
+	const { attributes, setAttributes } = props;
+	const { text, alignment, style, shadow, shadowOpacity } = attributes;
+
+	const onChangeAlignment = ( newAlignment ) => {
+		setAttributes( { alignment: newAlignment } );
+	};
+	const onChangeText = ( newText ) => {
+		setAttributes( { text: newText } );
+	};
+	const onChangeShadowOpacity = ( newShadowOpacity ) => {
+		setAttributes( { shadowOpacity: newShadowOpacity } );
+	};
+	const toggleShadow = () => {
+		setAttributes( { shadow: ! shadow } );
+	};
+
+	const classes = classnames( `text-box-align-${ alignment }`, {
+		'has-shadow': shadow,
+		[ `shadow-opacity-${ shadowOpacity }` ]: shadow && shadowOpacity,
+	} );
+
 	return (
 		<>
-			<BlockControls group="inline">
-				<p>Inline Controls</p>
-			</BlockControls>
-			<BlockControls group="block">
-				<p>Block Controls</p>
-			</BlockControls>
+			<InspectorControls>
+				{ shadow && (
+					<PanelBody title={ __( 'Shadow Setting', 'text-box' ) }>
+						<RangeControl
+							label={ __( 'Shadow Opacity', 'text-box' ) }
+							value={ shadowOpacity }
+							min={ 10 }
+							max={ 40 }
+							step={ 10 }
+							onChange={ onChangeShadowOpacity }
+						/>
+					</PanelBody>
+				) }
+			</InspectorControls>
 			<BlockControls
-				group="other"
 				controls={ [
 					{
-						title: 'Button 1',
-						icon: 'admin-generic',
-						isActive: true,
-						onClick: () => console.log( 'Button 1 Clicked' ),
-					},
-					{
-						title: 'Button 2',
-						icon: 'admin-collapse',
-						onClick: () => console.log( 'Button 2 Clicked' ),
+						icon: 'admin-page',
+						title: __( 'Shadow', 'text-box' ),
+						onClick: toggleShadow,
+						isActive: shadow,
 					},
 				] }
 			>
-				{ text && (
-					<ToolbarGroup>
-						<ToolbarButton
-							title={ __( 'Align Left', 'text-box' ) }
-							icon="editor-alignleft"
-							onClick={ () => console.log( 'Align Left' ) }
-						/>
-						<ToolbarButton
-							title={ __( 'Align Center', 'text-box' ) }
-							icon="editor-aligncenter"
-							onClick={ () => console.log( 'Align center' ) }
-						/>
-						<ToolbarButton
-							title={ __( 'Align Right', 'text-box' ) }
-							icon="editor-alignright"
-							onClick={ () => console.log( 'Align Right' ) }
-						/>
-						<ToolbarDropdownMenu
-							icon="arrow-down-alt2"
-							label={ __( 'More Alignments', 'text-box' ) }
-							controls={ [
-								{
-									title: __( 'Wide', 'text-box' ),
-									icon: 'align-wide',
-								},
-								{
-									title: __( 'Full', 'text-box' ),
-									icon: 'align-full-width',
-								},
-							] }
-						/>
-					</ToolbarGroup>
-				) }
-				<ToolbarGroup>
-					<p>Group 2</p>
-				</ToolbarGroup>
+				<AlignmentToolbar
+					value={ alignment }
+					onChange={ onChangeAlignment }
+				/>
 			</BlockControls>
-			<RichText
-				{ ...useBlockProps() }
-				onChange={ ( value ) => setAttributes( { text: value } ) }
-				value={ text }
-				placeholder={ __( 'Your Text', 'text-box' ) }
-				tagName="h4"
-				allowedFormats={ [] }
-			/>
+			<div
+				{ ...useBlockProps( {
+					className: classes,
+				} ) }
+			>
+				<RichText
+					className="text-box-title"
+					onChange={ onChangeText }
+					value={ text }
+					placeholder={ __( 'Your Text', 'text-box' ) }
+					tagName="h4"
+					allowedFormats={ [] }
+				/>
+				<BoxControlVisualizer
+					values={ style && style.spacing && style.spacing.padding }
+					showValues={
+						style && style.visualizers && style.visualizers.padding
+					}
+				/>
+			</div>
 		</>
 	);
 }
